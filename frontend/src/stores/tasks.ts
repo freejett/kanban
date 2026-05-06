@@ -1,6 +1,7 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import * as tasksApi from '../api/tasks'
+import * as usersApi from '../api/users'
 import type { Task, TaskStatus } from '../types'
 
 export const useTasksStore = defineStore('tasks', () => {
@@ -31,7 +32,7 @@ export const useTasksStore = defineStore('tasks', () => {
   }
 
   async function fetchUsers(search = '') {
-    users.value = await tasksApi.getUsers(search)
+    users.value = await usersApi.getUsers(search)
   }
 
   async function createTask(payload: { title: string; description?: string; deadline?: string | null }) {

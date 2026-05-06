@@ -3,6 +3,7 @@ import LoginView from '../views/LoginView.vue'
 import RegisterView from '../views/RegisterView.vue'
 import BoardView from '../views/BoardView.vue'
 import AdminLogsView from '../views/AdminLogsView.vue'
+import AdminUsersView from '../views/AdminUsersView.vue'
 import { useAuthStore } from '../stores/auth'
 
 const routes = [
@@ -10,6 +11,7 @@ const routes = [
   { path: '/register', component: RegisterView, meta: { guestOnly: true } },
   { path: '/', component: BoardView, meta: { auth: true } },
   { path: '/admin/logs', component: AdminLogsView, meta: { auth: true, admin: true } },
+  { path: '/admin/users', component: AdminUsersView, meta: { auth: true, admin: true } },
 ]
 
 export const router = createRouter({

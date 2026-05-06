@@ -5,12 +5,6 @@ export function getTasks(query = '') {
   return request<Task[]>(`/tasks/index.php${query ? `?${query}` : ''}`)
 }
 
-export function getUsers(search = '') {
-  return request<Array<{ id: number; full_name: string; email: string }>>(
-    `/users/index.php?search=${encodeURIComponent(search)}`,
-  )
-}
-
 export function createTask(input: { title: string; description?: string; deadline?: string | null }) {
   return request<Task>('/tasks/index.php', { method: 'POST', body: JSON.stringify(input) })
 }

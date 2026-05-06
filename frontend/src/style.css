@@ -207,6 +207,10 @@ button.ghost {
     backdrop-filter: blur(8px);
 }
 
+.full-width {
+    width: 100%;
+}
+
 .error {
     color: #dc2626;
     min-height: 1.2rem;

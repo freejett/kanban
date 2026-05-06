@@ -27,6 +27,7 @@ onMounted(() => {
       <div class="row">
         <button @click="ui.openTaskModal()">+ Задача</button>
         <button class="ghost" @click="router.push('/admin/logs')" v-if="auth.isAdmin">Логи</button>
+        <button class="ghost" @click="router.push('/admin/users')" v-if="auth.isAdmin">Пользователи</button>
         <button class="ghost" @click="auth.logout().then(() => router.push('/login'))">Выход</button>
       </div>
     </header>

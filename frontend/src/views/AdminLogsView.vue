@@ -23,7 +23,10 @@ onMounted(load)
   <main class="shell">
     <header class="topbar">
       <h2>Логи изменений</h2>
-      <button class="ghost" @click="router.push('/')">Назад</button>
+      <div class="row">
+        <button class="ghost" @click="router.push('/admin/users')">Пользователи</button>
+        <button class="ghost" @click="router.push('/')">Назад</button>
+      </div>
     </header>
     <LogTable :logs="logs" />
     <div class="row">
