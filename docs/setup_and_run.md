@@ -44,24 +44,17 @@ cd ..
 
 ## 3) Запуск в локальной разработке
 
-Нужно 2 терминала.
-
-### Терминал A: PHP API
-
 Из корня проекта:
 
 ```bash
-php -S localhost:8001 -t .
-```
-
-### Терминал B: Vue frontend
-
-```bash
 cd frontend
-npm run dev
+npm run build
+cd ..
+php -S localhost:8001 -t public_html
 ```
 
-По умолчанию Vite поднимется на `http://localhost:5173`, а API в текущей конфигурации идет на `http://localhost:8001/api`.
+Приложение будет доступно на `http://localhost:8001`.
+API доступен по `http://localhost:8001/api/*`, но сами приватные скрипты лежат вне public root (`api/`).
 
 ---
 
@@ -83,7 +76,7 @@ curl -s http://localhost:8001/api/init.php
 
 ## 5) Быстрый smoke-check
 
-1. Открыть `http://localhost:5173`
+1. Открыть `http://localhost:8001`
 2. Зарегистрировать пользователя
 3. Создать задачу
 4. Перетащить задачу между колонками
@@ -108,7 +101,7 @@ cd frontend
 npm run build
 ```
 
-Сборка будет в `frontend/dist`.
+Сборка будет в `public_html/`.
 
 ---
 
