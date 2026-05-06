@@ -17,9 +17,12 @@ const form = ref({
   full_name: '',
   role: 'user' as UserRole,
   color_hex: '#3B82F6',
+  is_active: 0,
 })
 
-const draft = ref<Record<number, { full_name: string; role: UserRole; color_hex: string; password: string }>>({})
+const draft = ref<
+  Record<number, { full_name: string; role: UserRole; color_hex: string; is_active: number; password: string }>
+>({})
 
 function ensureDraft(user: User) {
   if (!draft.value[user.id]) {
@@ -27,6 +30,7 @@ function ensureDraft(user: User) {
       full_name: user.full_name,
       role: user.role,
       color_hex: user.color_hex,
+      is_active: user.is_active,
       password: '',
     }
   }
@@ -43,7 +47,7 @@ async function submitCreate() {
     const created = await createUser(form.value)
     users.value.unshift(created)
     ensureDraft(created)
-    form.value = { email: '', password: '', full_name: '', role: 'user', color_hex: '#3B82F6' }
+    form.value = { email: '', password: '', full_name: '', role: 'user', color_hex: '#3B82F6', is_active: 0 }
     isCreateModalOpen.value = false
   } catch (e: any) {
     error.value = e.message
@@ -59,6 +63,7 @@ async function saveUser(user: User) {
       full_name: data.full_name,
       role: data.role,
       color_hex: data.color_hex,
+      is_active: data.is_active,
       ...(data.password ? { password: data.password } : {}),
     })
     const idx = users.value.findIndex((u) => u.id === user.id)
@@ -123,6 +128,7 @@ onMounted(load)
             <th>Имя</th>
             <th>Роль</th>
             <th>Цвет</th>
+            <th>Активен</th>
             <th>Новый пароль</th>
             <th>Действия</th>
           </tr>
@@ -138,6 +144,12 @@ onMounted(load)
               </select>
             </td>
             <td><input v-model="draft[user.id].color_hex" /></td>
+            <td>
+              <select v-model.number="draft[user.id].is_active">
+                <option :value="1">Да</option>
+                <option :value="0">Нет</option>
+              </select>
+            </td>
             <td><input v-model="draft[user.id].password" type="password" placeholder="Опц." /></td>
             <td class="row">
               <button class="ghost" @click="saveUser(user)">Сохранить</button>
@@ -165,6 +177,10 @@ onMounted(load)
           <select v-model="form.role">
             <option value="user">user</option>
             <option value="admin">admin</option>
+          </select>
+          <select v-model.number="form.is_active">
+            <option :value="0">Неактивен</option>
+            <option :value="1">Активен</option>
           </select>
           <input v-model="form.color_hex" placeholder="#3B82F6" />
         </div>

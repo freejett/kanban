@@ -11,13 +11,14 @@ export function createUser(payload: {
   full_name: string
   role: UserRole
   color_hex: string
+  is_active?: number
 }) {
   return request<User>('/users/index.php', { method: 'POST', body: JSON.stringify(payload) })
 }
 
 export function updateUser(
   id: number,
-  patch: Partial<Pick<User, 'full_name' | 'role' | 'color_hex'>> & { password?: string },
+  patch: Partial<Pick<User, 'full_name' | 'role' | 'color_hex' | 'is_active'>> & { password?: string },
 ) {
   return request<User>(`/users/index.php?id=${id}`, { method: 'PATCH', body: JSON.stringify(patch) })
 }

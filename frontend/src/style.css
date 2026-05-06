@@ -108,6 +108,8 @@ body {
     border-radius: .7rem;
     padding: .8rem;
     border-left: 4px solid var(--task-accent);
+    outline: 1.5px solid color-mix(in srgb, var(--task-accent) 70%, transparent);
+    outline-offset: -1px;
     box-shadow: var(--shadow);
     border: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
 }
@@ -125,18 +127,50 @@ body {
 
 .mobile-move {
     margin-top: .5rem;
+    display: flex;
+    align-items: center;
+    gap: .45rem;
+    flex-wrap: nowrap;
 }
 
 .mobile-move select {
-    width: 100%;
+    flex: 1 1 60%;
+    min-width: 0;
+    margin-left: 0;
 }
 
 .icon-button {
-    min-width: 2.25rem;
+    min-width: 2.1rem;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding-inline: .45rem;
+    padding-inline: .4rem;
+    flex: 0 0 auto;
+}
+
+.assignee-name {
+    margin: 0;
+    font-size: .78rem;
+    color: var(--text-muted);
+}
+
+.assignee-row {
+    margin-top: .45rem;
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+}
+
+.assignee-icon-circle {
+    width: 1.2rem;
+    height: 1.2rem;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: color-mix(in srgb, var(--task-accent) 18%, transparent);
+    border: 1px solid color-mix(in srgb, var(--task-accent) 48%, transparent);
+    color: var(--task-accent);
 }
 
 .badge {
@@ -218,6 +252,13 @@ button.ghost {
     margin: 0;
 }
 
+.success {
+    color: #16a34a;
+    min-height: 1.2rem;
+    font-size: .85rem;
+    margin: 0;
+}
+
 .modal-backdrop {
     position: fixed;
     inset: 0;
@@ -276,15 +317,6 @@ button.ghost {
     padding: .5rem;
     text-align: left;
     font-size: .85rem;
-}
-
-.theme-toggle {
-    position: fixed;
-    top: .75rem;
-    right: .75rem;
-    z-index: 50;
-    backdrop-filter: blur(6px);
-    box-shadow: var(--glow-soft);
 }
 
 @media (max-width: 900px) {

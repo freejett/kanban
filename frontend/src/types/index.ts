@@ -7,6 +7,7 @@ export interface User {
   full_name: string
   role: UserRole
   color_hex: string
+  is_active: number
   csrf_token?: string
 }
 

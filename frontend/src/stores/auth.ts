@@ -34,8 +34,8 @@ export const useAuthStore = defineStore('auth', () => {
   async function register(email: string, password: string, fullName: string) {
     loading.value = true
     try {
-      user.value = await authApi.register({ email, password, full_name: fullName })
-      setCsrfToken(user.value?.csrf_token)
+      await authApi.register({ email, password, full_name: fullName })
+      user.value = null
     } finally {
       loading.value = false
     }

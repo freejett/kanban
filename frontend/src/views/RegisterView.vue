@@ -1,20 +1,23 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 
 const fullName = ref('')
 const email = ref('')
 const password = ref('')
 const error = ref('')
+const success = ref('')
 const auth = useAuthStore()
-const router = useRouter()
 
 async function onSubmit() {
   error.value = ''
+  success.value = ''
   try {
     await auth.register(email.value, password.value, fullName.value)
-    await router.push('/')
+    success.value = 'Регистрация отправлена. Дождитесь активации администратором.'
+    fullName.value = ''
+    email.value = ''
+    password.value = ''
   } catch (e: any) {
     error.value = e.message
   }
@@ -29,8 +32,9 @@ async function onSubmit() {
       <input v-model="email" type="email" placeholder="Email" required />
       <input v-model="password" type="password" placeholder="Пароль" required />
       <p class="error">{{ error }}</p>
+      <p class="success">{{ success }}</p>
       <button :disabled="auth.loading">Создать аккаунт</button>
-      <RouterLink to="/login">Уже есть аккаунт</RouterLink>
+      <RouterLink to="/login">Уже есть аккаунт? Войти</RouterLink>
     </form>
   </main>
 </template>

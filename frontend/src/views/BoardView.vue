@@ -26,6 +26,7 @@ onMounted(() => {
       <h2>Kanban Board</h2>
       <div class="row">
         <button @click="ui.openTaskModal()">+ Задача</button>
+        <button class="ghost" @click="ui.toggleTheme()">{{ ui.theme === 'light' ? '🌙 Тёмная' : '☀️ Светлая' }}</button>
         <button class="ghost" @click="router.push('/admin/logs')" v-if="auth.isAdmin">Логи</button>
         <button class="ghost" @click="router.push('/admin/users')" v-if="auth.isAdmin">Пользователи</button>
         <button class="ghost" @click="auth.logout().then(() => router.push('/login'))">Выход</button>

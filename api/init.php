@@ -40,6 +40,21 @@ CREATE INDEX IF NOT EXISTS idx_logs_task ON task_logs(task_id);
 SQL;
 
   db()->exec($sql);
+  ensure_users_is_active_column();
+}
+
+function ensure_users_is_active_column(): void {
+  $columns = db()->query("PRAGMA table_info(users)")->fetchAll(PDO::FETCH_ASSOC);
+  $hasColumn = false;
+  foreach ($columns as $column) {
+    if (($column['name'] ?? '') === 'is_active') {
+      $hasColumn = true;
+      break;
+    }
+  }
+  if (!$hasColumn) {
+    db()->exec("ALTER TABLE users ADD COLUMN is_active INTEGER NOT NULL DEFAULT 1");
+  }
 }
 
 if (basename($_SERVER['SCRIPT_NAME'] ?? '') === 'init.php') {
