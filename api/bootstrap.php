@@ -11,6 +11,19 @@ if (!isset($_SESSION['csrf_token'])) {
   $_SESSION['csrf_token'] = bin2hex(random_bytes(16));
 }
 
+if (isset($_SERVER['HTTP_ORIGIN']) && $_SERVER['HTTP_ORIGIN'] === 'http://localhost:5173') {
+  header('Access-Control-Allow-Origin: http://localhost:5173');
+  header('Access-Control-Allow-Credentials: true');
+  header('Access-Control-Expose-Headers: X-CSRF-Token');
+  header('Vary: Origin');
+}
+header('Access-Control-Allow-Headers: Content-Type, X-CSRF-Token');
+header('Access-Control-Allow-Methods: GET, POST, PATCH, DELETE, OPTIONS');
+if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'OPTIONS') {
+  http_response_code(204);
+  exit;
+}
+
 header('Content-Type: application/json; charset=utf-8');
 header('X-CSRF-Token: ' . $_SESSION['csrf_token']);
 

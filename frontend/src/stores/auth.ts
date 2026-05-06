@@ -17,7 +17,7 @@ export const useAuthStore = defineStore('auth', () => {
       setCsrfToken(user.value?.csrf_token)
     } catch {
       user.value = null
-      setCsrfToken('')
+      // keep CSRF token obtained from response headers even when user is unauthorized
     }
   }
 
