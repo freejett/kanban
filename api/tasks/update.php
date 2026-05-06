@@ -17,12 +17,13 @@ $oldStmt->execute([$id]);
 $old = $oldStmt->fetch(PDO::FETCH_ASSOC);
 if (!$old) json_error('Task not found', 404);
 
-$allowed = ['status', 'assigned_to', 'deadline'];
+$allowed = ['status', 'assigned_to', 'deadline', 'title', 'description'];
 $patch = [];
 foreach ($allowed as $key) {
   if (array_key_exists($key, $in)) $patch[$key] = $in[$key];
 }
 if (!$patch) json_error('Nothing to update', 422);
+if (array_key_exists('title', $patch) && trim((string)$patch['title']) === '') json_error('Title is required', 422);
 
 $pdo->beginTransaction();
 try {
@@ -38,7 +39,7 @@ try {
   $upd = $pdo->prepare($sql);
   $upd->execute($params);
 
-  foreach (['status', 'assigned_to', 'deadline'] as $f) {
+  foreach (['status', 'assigned_to', 'deadline', 'title', 'description'] as $f) {
     if (array_key_exists($f, $patch) && (string)$old[$f] !== (string)$patch[$f]) {
       $log = $pdo->prepare('INSERT INTO task_logs (task_id, changed_by, action, old_value, new_value) VALUES (?, ?, ?, ?, ?)');
       $log->execute([$id, $auth['id'], $f . '_changed', (string)$old[$f], (string)$patch[$f]]);

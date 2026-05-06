@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import { Pencil, Trash2 } from 'lucide-vue-next'
 import type { Task } from '../types'
 
 const props = defineProps<{ task: Task }>()
-const emit = defineEmits<{ move: [id: number, status: Task['status']] }>()
+const emit = defineEmits<{ move: [id: number, status: Task['status']]; edit: [task: Task]; remove: [task: Task] }>()
 
 function deadlineBadge(deadline: string | null) {
   if (!deadline) return 'badge-gray'
@@ -21,6 +22,12 @@ function deadlineBadge(deadline: string | null) {
       {{ task.deadline ? new Date(task.deadline).toLocaleString() : 'Без дедлайна' }}
     </span>
     <div class="mobile-move">
+      <button class="ghost icon-button" @click="emit('edit', props.task)" aria-label="Редактировать задачу" title="Редактировать">
+        <Pencil :size="16" />
+      </button>
+      <button class="ghost icon-button" @click="emit('remove', props.task)" aria-label="Удалить задачу" title="Удалить">
+        <Trash2 :size="16" />
+      </button>
       <select @change="emit('move', props.task.id, ($event.target as HTMLSelectElement).value as Task['status'])">
         <option value="">Переместить...</option>
         <option value="todo">To Do</option>

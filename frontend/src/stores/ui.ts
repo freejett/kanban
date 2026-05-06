@@ -1,10 +1,14 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
+import type { Task } from '../types'
 
 type ThemeMode = 'light' | 'dark'
 
 export const useUiStore = defineStore('ui', () => {
   const isTaskModalOpen = ref(false)
+  const isDeleteModalOpen = ref(false)
+  const editingTask = ref<Task | null>(null)
+  const deletingTask = ref<Task | null>(null)
   const theme = ref<ThemeMode>('light')
 
   function applyTheme(mode: ThemeMode) {
@@ -32,11 +36,33 @@ export const useUiStore = defineStore('ui', () => {
     applyTheme(theme.value === 'light' ? 'dark' : 'light')
   }
 
-  function openTaskModal() {
+  function openTaskModal(task: Task | null = null) {
+    editingTask.value = task
     isTaskModalOpen.value = true
   }
   function closeTaskModal() {
+    editingTask.value = null
     isTaskModalOpen.value = false
   }
-  return { isTaskModalOpen, theme, initTheme, toggleTheme, openTaskModal, closeTaskModal }
+  function openDeleteModal(task: Task) {
+    deletingTask.value = task
+    isDeleteModalOpen.value = true
+  }
+  function closeDeleteModal() {
+    deletingTask.value = null
+    isDeleteModalOpen.value = false
+  }
+  return {
+    isTaskModalOpen,
+    isDeleteModalOpen,
+    editingTask,
+    deletingTask,
+    theme,
+    initTheme,
+    toggleTheme,
+    openTaskModal,
+    closeTaskModal,
+    openDeleteModal,
+    closeDeleteModal,
+  }
 })

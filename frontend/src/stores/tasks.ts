@@ -39,7 +39,10 @@ export const useTasksStore = defineStore('tasks', () => {
     tasks.value.unshift(item)
   }
 
-  async function syncTask(id: number, patch: Partial<Pick<Task, 'status' | 'assigned_to' | 'deadline'>>) {
+  async function syncTask(
+    id: number,
+    patch: Partial<Pick<Task, 'status' | 'assigned_to' | 'deadline' | 'title' | 'description'>>,
+  ) {
     const prev = tasks.value.find((t) => t.id === id)
     const snapshot = prev ? { ...prev } : null
     if (prev) Object.assign(prev, patch)

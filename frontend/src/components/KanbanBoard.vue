@@ -2,10 +2,12 @@
 import { computed } from 'vue'
 import { VueDraggable } from 'vue-draggable-plus'
 import { useTasksStore } from '../stores/tasks'
+import { useUiStore } from '../stores/ui'
 import TaskCard from './TaskCard.vue'
-import type { TaskStatus } from '../types'
+import type { Task, TaskStatus } from '../types'
 
 const store = useTasksStore()
+const ui = useUiStore()
 
 const columns = [
   { status: 'todo', title: 'To Do' },
@@ -29,6 +31,14 @@ function onDragEnd(event: any, toStatus: TaskStatus) {
 function moveTask(id: number, status: TaskStatus) {
   if (status) store.syncTask(id, { status })
 }
+
+function editTask(task: Task) {
+  ui.openTaskModal(task)
+}
+
+function removeTask(task: Task) {
+  ui.openDeleteModal(task)
+}
 </script>
 
 <template>
@@ -47,6 +57,8 @@ function moveTask(id: number, status: TaskStatus) {
           :key="task.id"
           :task="task"
           @move="(id, status) => moveTask(id, status)"
+          @edit="(task) => editTask(task)"
+          @remove="(task) => removeTask(task)"
         />
       </VueDraggable>
     </section>

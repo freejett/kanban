@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import FilterBar from '../components/FilterBar.vue'
 import KanbanBoard from '../components/KanbanBoard.vue'
 import TaskModal from '../components/TaskModal.vue'
+import DeleteTaskModal from '../components/DeleteTaskModal.vue'
 import { useAuthStore } from '../stores/auth'
 import { useTasksStore } from '../stores/tasks'
 import { useUiStore } from '../stores/ui'
@@ -15,6 +16,7 @@ const router = useRouter()
 
 onMounted(() => {
   tasks.fetchTasks()
+  tasks.fetchUsers()
 })
 </script>
 
@@ -23,7 +25,7 @@ onMounted(() => {
     <header class="topbar">
       <h2>Kanban Board</h2>
       <div class="row">
-        <button @click="ui.openTaskModal">+ Задача</button>
+        <button @click="ui.openTaskModal()">+ Задача</button>
         <button class="ghost" @click="router.push('/admin/logs')" v-if="auth.isAdmin">Логи</button>
         <button class="ghost" @click="auth.logout().then(() => router.push('/login'))">Выход</button>
       </div>
@@ -32,5 +34,6 @@ onMounted(() => {
     <FilterBar />
     <KanbanBoard />
     <TaskModal />
+    <DeleteTaskModal />
   </main>
 </template>
