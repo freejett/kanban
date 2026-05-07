@@ -44,7 +44,13 @@ export const useTasksStore = defineStore('tasks', () => {
     tasks.value = tasks.value.map(withAssignee)
   }
 
-  async function createTask(payload: { title: string; description?: string; deadline?: string | null }) {
+  async function createTask(payload: {
+    title: string
+    description?: string
+    deadline?: string | null
+    status?: TaskStatus
+    assigned_to?: number | null
+  }) {
     const item = await tasksApi.createTask(payload)
     tasks.value.unshift(withAssignee(item))
   }

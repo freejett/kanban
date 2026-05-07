@@ -39,11 +39,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   if ($title === '') json_error('Title is required', 422);
   $description = trim((string)($in['description'] ?? ''));
   $deadline = ($in['deadline'] ?? null) ?: null;
+  $status = (string)($in['status'] ?? 'todo');
+  $allowedStatuses = ['todo', 'in_progress', 'done', 'archived'];
+  if (!in_array($status, $allowedStatuses, true)) json_error('Invalid status', 422);
+  $assignedTo = array_key_exists('assigned_to', $in) && $in['assigned_to'] !== null ? (int)$in['assigned_to'] : null;
+
+  if ($assignedTo !== null) {
+    $userCheck = db()->prepare('SELECT id FROM users WHERE id = ?');
+    $userCheck->execute([$assignedTo]);
+    if (!$userCheck->fetch(PDO::FETCH_ASSOC)) json_error('Assignee not found', 422);
+  }
+
   $pdo = db();
   $pdo->beginTransaction();
   try {
-    $stmt = $pdo->prepare('INSERT INTO tasks (title, description, created_by, deadline) VALUES (?, ?, ?, ?)');
-    $stmt->execute([$title, $description, $auth['id'], $deadline]);
+    $stmt = $pdo->prepare('INSERT INTO tasks (title, description, status, assigned_to, created_by, deadline) VALUES (?, ?, ?, ?, ?, ?)');
+    $stmt->execute([$title, $description, $status, $assignedTo, $auth['id'], $deadline]);
     $id = (int)$pdo->lastInsertId();
     $pdo->commit();
   } catch (Throwable $e) {

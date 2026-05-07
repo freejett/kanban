@@ -34,6 +34,8 @@ async function submit() {
       title: title.value,
       description: description.value,
       deadline: deadline.value || null,
+      status: status.value,
+      assigned_to: assignee.value === '' ? null : Number(assignee.value),
     })
   }
   title.value = ''

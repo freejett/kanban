@@ -5,7 +5,13 @@ export function getTasks(query = '') {
   return request<Task[]>(`/tasks/index.php${query ? `?${query}` : ''}`)
 }
 
-export function createTask(input: { title: string; description?: string; deadline?: string | null }) {
+export function createTask(input: {
+  title: string
+  description?: string
+  deadline?: string | null
+  status?: Task['status']
+  assigned_to?: number | null
+}) {
   return request<Task>('/tasks/index.php', { method: 'POST', body: JSON.stringify(input) })
 }
 
