@@ -27,10 +27,11 @@ const grouped = computed(() =>
   })),
 )
 
-function onDragEnd(event: { item?: HTMLElement }, toStatus: TaskStatus) {
+function onDragEnd(event: { item?: HTMLElement; to?: HTMLElement; from?: HTMLElement }, columnStatus: TaskStatus) {
   const rawId = event.item?.dataset.taskId
   const id = rawId ? Number(rawId) : 0
-  if (id > 0) store.syncTask(id, { status: toStatus })
+  const targetStatus = (event.to?.dataset.columnStatus as TaskStatus | undefined) ?? columnStatus
+  if (id > 0) store.syncTask(id, { status: targetStatus })
 }
 
 function moveTask(id: number, status: TaskStatus) {
@@ -52,6 +53,7 @@ function removeTask(task: Task) {
       <h3>{{ column.title }}</h3>
       <VueDraggable
         class="dropzone"
+        :data-column-status="column.status"
         :model-value="column.tasks"
         group="tasks"
         item-key="id"
