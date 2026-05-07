@@ -10,22 +10,27 @@ const store = useTasksStore()
 const ui = useUiStore()
 
 const columns = [
-  { status: 'todo', title: 'To Do' },
-  { status: 'in_progress', title: 'In Progress' },
-  { status: 'done', title: 'Done' },
+  { status: 'todo', title: 'К выполнению' },
+  { status: 'in_progress', title: 'В работе' },
+  { status: 'done', title: 'Готово' },
+  { status: 'archived', title: 'Архив' },
 ] as const
 
+const visibleColumns = computed(() =>
+  columns.filter((column) => column.status !== 'archived' || store.statusFilter === 'archived'),
+)
+
 const grouped = computed(() =>
-  columns.map((c) => ({
+  visibleColumns.value.map((c) => ({
     ...c,
     tasks: store.filteredTasks.filter((t) => t.status === c.status),
   })),
 )
 
-function onDragEnd(event: any, toStatus: TaskStatus) {
-  const task = event.item?._underlying_vm_
-  const id = task?.id
-  if (id) store.syncTask(id, { status: toStatus })
+function onDragEnd(event: { item?: HTMLElement }, toStatus: TaskStatus) {
+  const rawId = event.item?.dataset.taskId
+  const id = rawId ? Number(rawId) : 0
+  if (id > 0) store.syncTask(id, { status: toStatus })
 }
 
 function moveTask(id: number, status: TaskStatus) {

@@ -7,7 +7,7 @@ import { useUiStore } from '../stores/ui'
 const title = ref('')
 const description = ref('')
 const deadline = ref('')
-const status = ref<'todo' | 'in_progress' | 'done'>('todo')
+const status = ref<'todo' | 'in_progress' | 'done' | 'archived'>('todo')
 const assignee = ref<number | ''>('')
 const tasks = useTasksStore()
 const ui = useUiStore()
@@ -91,9 +91,10 @@ onBeforeUnmount(() => {
       <textarea v-model="description" placeholder="Описание" />
       <input v-model="deadline" type="datetime-local" />
       <select v-model="status">
-        <option value="todo">To Do</option>
-        <option value="in_progress">In Progress</option>
-        <option value="done">Done</option>
+        <option value="todo">К выполнению</option>
+        <option value="in_progress">В работе</option>
+        <option value="done">Готово</option>
+        <option value="archived">Архив</option>
       </select>
       <select v-model.number="assignee">
         <option value="">Без исполнителя</option>

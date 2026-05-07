@@ -1,5 +1,5 @@
 export type UserRole = 'user' | 'admin'
-export type TaskStatus = 'todo' | 'in_progress' | 'done'
+export type TaskStatus = 'todo' | 'in_progress' | 'done' | 'archived'
 
 export interface User {
   id: number

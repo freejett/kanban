@@ -2,7 +2,7 @@ import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import * as tasksApi from '../api/tasks'
 import * as usersApi from '../api/users'
-import type { Task, TaskStatus } from '../types'
+import type { Task, TaskStatus, User } from '../types'
 
 export const useTasksStore = defineStore('tasks', () => {
   const tasks = ref<Task[]>([])
@@ -10,7 +10,14 @@ export const useTasksStore = defineStore('tasks', () => {
   const statusFilter = ref<TaskStatus | ''>('')
   const assigneeFilter = ref<number | ''>('')
   const searchQuery = ref('')
-  const users = ref<Array<{ id: number; full_name: string; email: string }>>([])
+  const users = ref<User[]>([])
+
+  function withAssignee(task: Task): Task {
+    if (task.assigned_user) return task
+    if (task.assigned_to == null) return { ...task, assigned_user: null }
+    const assignedUser = users.value.find((u) => u.id === task.assigned_to) ?? null
+    return { ...task, assigned_user: assignedUser }
+  }
 
   const filteredTasks = computed(() =>
     tasks.value.filter((t) => {
@@ -25,7 +32,8 @@ export const useTasksStore = defineStore('tasks', () => {
   async function fetchTasks() {
     loading.value = true
     try {
-      tasks.value = await tasksApi.getTasks()
+      const loaded = await tasksApi.getTasks()
+      tasks.value = loaded.map(withAssignee)
     } finally {
       loading.value = false
     }
@@ -33,11 +41,12 @@ export const useTasksStore = defineStore('tasks', () => {
 
   async function fetchUsers(search = '') {
     users.value = await usersApi.getUsers(search)
+    tasks.value = tasks.value.map(withAssignee)
   }
 
   async function createTask(payload: { title: string; description?: string; deadline?: string | null }) {
     const item = await tasksApi.createTask(payload)
-    tasks.value.unshift(item)
+    tasks.value.unshift(withAssignee(item))
   }
 
   async function syncTask(
@@ -46,11 +55,16 @@ export const useTasksStore = defineStore('tasks', () => {
   ) {
     const prev = tasks.value.find((t) => t.id === id)
     const snapshot = prev ? { ...prev } : null
-    if (prev) Object.assign(prev, patch)
+    if (prev) {
+      Object.assign(prev, patch)
+      if (Object.prototype.hasOwnProperty.call(patch, 'assigned_to')) {
+        prev.assigned_user = users.value.find((u) => u.id === prev.assigned_to) ?? null
+      }
+    }
     try {
       const updated = await tasksApi.patchTask(id, patch)
       const idx = tasks.value.findIndex((t) => t.id === id)
-      if (idx >= 0) tasks.value[idx] = updated
+      if (idx >= 0) tasks.value[idx] = withAssignee(updated)
     } catch (e) {
       if (snapshot) {
         const idx = tasks.value.findIndex((t) => t.id === id)

@@ -23,7 +23,7 @@ onMounted(() => {
 <template>
   <main class="shell">
     <header class="topbar">
-      <h2>Kanban Board</h2>
+      <h2>Планирование</h2>
       <div class="row">
         <button @click="ui.openTaskModal()">+ Задача</button>
         <button class="ghost" @click="ui.toggleTheme()">{{ ui.theme === 'light' ? '🌙 Тёмная' : '☀️ Светлая' }}</button>

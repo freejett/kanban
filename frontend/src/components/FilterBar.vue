@@ -15,9 +15,10 @@ onMounted(() => {
     <input v-model="searchQuery" placeholder="Поиск по задачам" />
     <select v-model="statusFilter">
       <option value="">Все статусы</option>
-      <option value="todo">todo</option>
-      <option value="in_progress">in_progress</option>
-      <option value="done">done</option>
+      <option value="todo">К выполнению</option>
+      <option value="in_progress">В работе</option>
+      <option value="done">Готово</option>
+      <option value="archived">Архив</option>
     </select>
     <select v-model.number="assigneeFilter">
       <option value="">Все исполнители</option>

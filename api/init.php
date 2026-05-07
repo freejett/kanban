@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS tasks (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   title TEXT NOT NULL,
   description TEXT DEFAULT '',
-  status TEXT DEFAULT 'todo' CHECK(status IN ('todo', 'in_progress', 'done')),
+  status TEXT DEFAULT 'todo' CHECK(status IN ('todo', 'in_progress', 'done', 'archived')),
   assigned_to INTEGER REFERENCES users(id) ON DELETE SET NULL,
   created_by INTEGER REFERENCES users(id),
   deadline DATETIME,
@@ -41,6 +41,7 @@ SQL;
 
   db()->exec($sql);
   ensure_users_is_active_column();
+  ensure_tasks_support_archived_status();
 }
 
 function ensure_users_is_active_column(): void {
@@ -54,6 +55,47 @@ function ensure_users_is_active_column(): void {
   }
   if (!$hasColumn) {
     db()->exec("ALTER TABLE users ADD COLUMN is_active INTEGER NOT NULL DEFAULT 1");
+  }
+}
+
+function ensure_tasks_support_archived_status(): void {
+  $sqlRow = db()->query("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'tasks'")->fetch(PDO::FETCH_ASSOC);
+  $createSql = strtolower((string)($sqlRow['sql'] ?? ''));
+  if (str_contains($createSql, "'archived'")) {
+    return;
+  }
+
+  $pdo = db();
+  $pdo->beginTransaction();
+  try {
+    $pdo->exec('PRAGMA foreign_keys = OFF');
+    $pdo->exec('ALTER TABLE tasks RENAME TO tasks_old');
+    $pdo->exec(
+      "CREATE TABLE tasks (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        description TEXT DEFAULT '',
+        status TEXT DEFAULT 'todo' CHECK(status IN ('todo', 'in_progress', 'done', 'archived')),
+        assigned_to INTEGER REFERENCES users(id) ON DELETE SET NULL,
+        created_by INTEGER REFERENCES users(id),
+        deadline DATETIME,
+        created_at DATETIME DEFAULT (datetime('now')),
+        updated_at DATETIME DEFAULT (datetime('now'))
+      )"
+    );
+    $pdo->exec('INSERT INTO tasks (id, title, description, status, assigned_to, created_by, deadline, created_at, updated_at)
+      SELECT id, title, description, status, assigned_to, created_by, deadline, created_at, updated_at FROM tasks_old');
+    $pdo->exec('DROP TABLE tasks_old');
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status)');
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_tasks_assigned ON tasks(assigned_to)');
+    $pdo->exec('PRAGMA foreign_keys = ON');
+    $pdo->commit();
+  } catch (Throwable $e) {
+    if ($pdo->inTransaction()) {
+      $pdo->rollBack();
+    }
+    $pdo->exec('PRAGMA foreign_keys = ON');
+    throw $e;
   }
 }
 

@@ -15,7 +15,7 @@ function deadlineBadge(deadline: string | null) {
 </script>
 
 <template>
-  <article class="task-card" :style="{ '--task-accent': task.assigned_user?.color_hex ?? '#94A3B8' }">
+  <article class="task-card" :data-task-id="task.id" :style="{ '--task-accent': task.assigned_user?.color_hex ?? '#94A3B8' }">
     <h4>{{ task.title }}</h4>
     <p class="desc">{{ task.description }}</p>
     <span class="badge" :class="deadlineBadge(task.deadline)">
@@ -24,9 +24,10 @@ function deadlineBadge(deadline: string | null) {
     <div class="mobile-move">
       <select @change="emit('move', props.task.id, ($event.target as HTMLSelectElement).value as Task['status'])">
         <option value="">Переместить...</option>
-        <option value="todo">To Do</option>
-        <option value="in_progress">In Progress</option>
-        <option value="done">Done</option>
+        <option value="todo">К выполнению</option>
+        <option value="in_progress">В работе</option>
+        <option value="done">Готово</option>
+        <option value="archived">Архив</option>
       </select>
       <button class="ghost icon-button" @click="emit('edit', props.task)" aria-label="Редактировать задачу" title="Редактировать">
         <Pencil :size="16" />
