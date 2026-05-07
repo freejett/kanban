@@ -7,6 +7,16 @@ $auth = require_auth();
 if ($_SERVER['REQUEST_METHOD'] !== 'PATCH') json_error('Method not allowed', 405);
 verify_csrf();
 
+function normalize_deadline_date($raw): ?string {
+  if ($raw === null || $raw === '') return null;
+  $value = trim((string)$raw);
+  $datePart = substr($value, 0, 10);
+  if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $datePart)) return null;
+  [$year, $month, $day] = array_map('intval', explode('-', $datePart));
+  if (!checkdate($month, $day, $year)) return null;
+  return $datePart . ' ' . date('H:i:s');
+}
+
 $id = (int)($_GET['id'] ?? 0);
 if ($id <= 0) json_error('Invalid id', 422);
 $in = body_json();
@@ -24,6 +34,13 @@ foreach ($allowed as $key) {
 }
 if (!$patch) json_error('Nothing to update', 422);
 if (array_key_exists('title', $patch) && trim((string)$patch['title']) === '') json_error('Title is required', 422);
+if (array_key_exists('deadline', $patch)) {
+  $normalizedDeadline = normalize_deadline_date($patch['deadline']);
+  if ($patch['deadline'] !== null && $patch['deadline'] !== '' && $normalizedDeadline === null) {
+    json_error('Invalid deadline date', 422);
+  }
+  $patch['deadline'] = $normalizedDeadline;
+}
 
 $pdo->beginTransaction();
 try {

@@ -5,6 +5,16 @@ require_once __DIR__ . '/../init.php';
 ensure_schema();
 $auth = require_auth();
 
+function normalize_deadline_date($raw): ?string {
+  if ($raw === null || $raw === '') return null;
+  $value = trim((string)$raw);
+  $datePart = substr($value, 0, 10);
+  if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $datePart)) return null;
+  [$year, $month, $day] = array_map('intval', explode('-', $datePart));
+  if (!checkdate($month, $day, $year)) return null;
+  return $datePart . ' ' . date('H:i:s');
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
   $sql = 'SELECT t.*, u.id as au_id, u.email as au_email, u.full_name as au_full_name, u.role as au_role, u.color_hex as au_color_hex
           FROM tasks t LEFT JOIN users u ON u.id = t.assigned_to ORDER BY t.updated_at DESC';
@@ -38,7 +48,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $title = trim((string)($in['title'] ?? ''));
   if ($title === '') json_error('Title is required', 422);
   $description = trim((string)($in['description'] ?? ''));
-  $deadline = ($in['deadline'] ?? null) ?: null;
+  $deadline = normalize_deadline_date($in['deadline'] ?? null);
+  if (($in['deadline'] ?? null) !== null && ($in['deadline'] ?? '') !== '' && $deadline === null) {
+    json_error('Invalid deadline date', 422);
+  }
   $status = (string)($in['status'] ?? 'todo');
   $allowedStatuses = ['todo', 'in_progress', 'done', 'archived'];
   if (!in_array($status, $allowedStatuses, true)) json_error('Invalid status', 422);

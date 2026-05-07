@@ -52,7 +52,7 @@ watch(
     if (!task) return
     title.value = task.title
     description.value = task.description
-    deadline.value = task.deadline ? task.deadline.slice(0, 16) : ''
+    deadline.value = task.deadline ? task.deadline.slice(0, 10) : ''
     status.value = task.status
     assignee.value = task.assigned_to ?? ''
   },
@@ -91,7 +91,7 @@ onBeforeUnmount(() => {
       </div>
       <input v-model="title" placeholder="Заголовок" />
       <textarea v-model="description" placeholder="Описание" />
-      <input v-model="deadline" type="datetime-local" />
+      <input v-model="deadline" type="date" />
       <select v-model="status">
         <option value="todo">К выполнению</option>
         <option value="in_progress">В работе</option>
